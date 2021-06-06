@@ -33,9 +33,9 @@ function showError(form, error) {
 }
 
 var paymentRequest = function () {
-    let phone_number = ""
-    let name = ""
-    let email = ""
+    let phone_number = window.intasend_params.customer_phone
+    let name = window.intasend_params.customer_first_name + " " + window.intasend_params.customer_last_name
+    let email = window.intasend_params.customer_email
     let comments = ""
     let form = window.jqInstance('form.woocommerce-checkout');
     let public_key = window.intasend_params.public_key
@@ -43,18 +43,15 @@ var paymentRequest = function () {
     let amount = window.intasend_params.total
     let currency = window.intasend_params.currency
     let api_ref = window.intasend_params.api_ref
+    let bill_address = window.intasend_params.customer_address
+    let bill_country = window.intasend_params.customer_country
+    let bill_city = window.intasend_params.customer_city
     let live = true
     if (testmode) {
         live = false
     }
     try {
-        phone_number = form.find("#billing_phone").val()
-        email = form.find("#billing_email").val()
         comments = form.find("#order_comments")
-        first_name = form.find("#billing_first_name").val()
-        last_name = form.find("#billing_last_name").val()
-
-        name = first_name + " " + last_name
 
         if (!phone_number) {
             showError(form, "Phone number is required!")
@@ -64,12 +61,8 @@ var paymentRequest = function () {
             showError(form, "Email is required!")
             return false
         }
-        if (!first_name) {
+        if (!name) {
             showError(form, "First name is required!")
-            return false
-        }
-        if (!last_name) {
-            showError(form, "Last name is required!")
             return false
         }
 
@@ -103,7 +96,10 @@ var paymentRequest = function () {
         "email": email,
         "name": name,
         "currency": currency,
-        "comments": comments
+        "comments": comments,
+        "address": bill_address,
+        "country": bill_country,
+        "city": bill_city
     })
 
 

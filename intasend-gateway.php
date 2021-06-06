@@ -115,7 +115,7 @@ function intasend_init_gateway_class()
          */
         public function payment_fields()
         {
-            echo wpautop(wp_kses_post("<img src='/images/Intasend-PaymentBanner.png' alt='intasend-payment'>"));
+            echo wpautop(wp_kses_post("<img src='".plugins_url('/assets/Intasend-PaymentBanner.png', __FILE__)."' alt='intasend-payment'>"));
             if ($this->description) {
                 if ($this->testmode) {
                     $this->description .= ' TEST MODE ENABLED. In test mode, you can use the card numbers listed in <a href="https://developers.intasend.com/sandbox-and-live-environments#test-details-for-sandbox-environment" target="_blank" rel="noopener noreferrer">documentation</a>.';
@@ -129,8 +129,8 @@ function intasend_init_gateway_class()
         }
 
         /*
-		 * Custom CSS and JS, in most cases required only when you decided to go with a custom form
-		 */
+         * Custom CSS and JS, in most cases required only when you decided to go with a custom form
+         */
         public function payment_scripts()
         {
             global $woocommerce;
@@ -157,10 +157,10 @@ function intasend_init_gateway_class()
                 return;
             }
 
-            wp_enqueue_script('intasend_js', '/js/plugins/intasend-inline.js');
-            wp_enqueue_script('jquery.validate', '/js/plugins/jquery.validate.min.js');
+            wp_enqueue_script('intasend_js', plugins_url( '/assets/intasend-inline.js', __FILE__ ));
+            wp_enqueue_script('jquery.validate', plugins_url('/assets/jquery.validate.min.js', __FILE__));
 
-            wp_register_script('woocommerce_intasend', plugins_url('/js/intasend.js', __FILE__), array('jquery', 'intasend_js'));
+            wp_register_script('woocommerce_intasend', plugins_url('/assets/intasend.js', __FILE__), array('jquery', 'intasend_js'));
 
             $currency = strtoupper(get_woocommerce_currency());
             if (!$currency) {
@@ -172,15 +172,22 @@ function intasend_init_gateway_class()
                 'testmode' => $this->testmode,
                 'total' => $woocommerce->cart->total,
                 'currency' => $currency,
-                'api_ref' => $this->api_ref
+                'api_ref' => $this->api_ref,
+                'customer_first_name' => $woocommerce->cart->get_customer()->get_billing_first_name(),
+                'customer_last_name' => $woocommerce->cart->get_customer()->get_billing_last_name(),
+                'customer_email' => $woocommerce->cart->get_customer()->get_billing_email(),
+                'customer_phone' => $woocommerce->cart->get_customer()->get_billing_phone(),
+                'customer_address' => $woocommerce->cart->get_customer()->get_billing_address(),
+                'customer_country' => $woocommerce->cart->get_customer()->get_billing_country(),
+                'customer_city' => $woocommerce->cart->get_customer()->get_billing_city()
             ));
 
             wp_enqueue_script('woocommerce_intasend');
         }
 
         /*
- 		 * Fields validation
-		 */
+         * Fields validation
+         */
         public function validate_fields()
         {
             if (empty($_POST['billing_first_name'])) {
@@ -203,8 +210,8 @@ function intasend_init_gateway_class()
         }
 
         /*
-		 * Check if payment is successful and complete transaction
-		 */
+         * Check if payment is successful and complete transaction
+         */
         public function process_payment($order_id)
         {
             global $woocommerce;
@@ -318,8 +325,8 @@ function intasend_init_gateway_class()
         }
 
         /*
-		 * In case you need a webhook, like PayPal IPN etc
-		 */
+         * In case you need a webhook, like PayPal IPN etc
+         */
         public function webhook()
         {
             $order = wc_get_order($_GET['id']);
